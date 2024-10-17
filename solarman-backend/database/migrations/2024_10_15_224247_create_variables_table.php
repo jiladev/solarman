@@ -15,10 +15,8 @@ class CreateVariablesTable extends Migration
     {
         Schema::create('variables', function (Blueprint $table) {
             $table->id();
-            $table->float('var_monofasica');
-            $table->float('var_bifasica');
-            $table->float('var_trifasica');
-            $table->float('var_kvCopel');
+            $table->string('name');
+            $table->float('value');
             $table->softDeletes();
             $table->timestamps();
         });

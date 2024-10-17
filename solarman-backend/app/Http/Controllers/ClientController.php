@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendClientCreatedEmail;
 use App\Models\Client;
 use App\Models\ClientEstimate;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 class ClientController extends Controller
@@ -85,12 +87,14 @@ class ClientController extends Controller
             ]);
         }
 
+        SendClientCreatedEmail::dispatch($client);
+
         return response()->json($client, 201);
     }
 
     public function show($id)
     {
-        $client = Client::findOrFail($id);
+        $client = Client::findOrFail($id)->load(['estimates', 'reports']);
 
         return response()->json($client, 200);
     }

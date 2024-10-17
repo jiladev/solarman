@@ -1,8 +1,14 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VariableController;
+use App\Mail\ClientCreated;
+use App\Models\Client;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -32,4 +38,33 @@ Route::prefix('/clients')->group(function () {
     Route::post('/handle-client-estimate', [ClientController::class, 'handleClientEstimate']);
     Route::get('/{id}', [ClientController::class, 'show']);
     Route::delete('/{id}', [ClientController::class, 'destroy']);
+});
+
+Route::post('/login', [AuthController::class, 'login'])->name('login');
+
+//Rotas protegidas para usuários autenticados
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+
+    Route::prefix('/reports')->group(function () {
+        Route::post('/', [ReportController::class, 'handleReport']);
+    });
+});
+
+Route::prefix('/variables')->group(function () {
+    Route::get('/', [VariableController::class, 'index']);
+    Route::put('/{id}', [VariableController::class, 'update']);
+});
+
+Route::get('/reports', [ReportController::class, 'index']);
+Route::get('/reports/{id}', [ReportController::class, 'show']);
+
+Route::post('/send-email', function () {
+    $client = new Client();
+    $client->name = 'João';
+    $client->phone = '41999999999';
+    $client->fatura_copel = 100;
+    $client->final_value_discount = 90;
+
+    Mail::to('agente@example.com')->send(new ClientCreated($client));
 });
