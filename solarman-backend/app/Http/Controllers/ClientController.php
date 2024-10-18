@@ -66,30 +66,24 @@ class ClientController extends Controller
         if ($client) {
             $client->name = $request->name;
             $client->save();
-
-            $clientEstimate = ClientEstimate::updateOrCreate(
-                ['client_id' => $client->id],
-                [
-                    'fatura_copel' => $request->fatura_copel,
-                    'final_value_discount' => $request->final_value_discount,
-                ]
-            );
         } else {
             $client = Client::create([
                 'name' => $request->name,
                 'phone' => $request->phone,
             ]);
-
-            ClientEstimate::create([
-                'client_id' => $client->id,
-                'fatura_copel' => $request->fatura_copel,
-                'final_value_discount' => $request->final_value_discount,
-            ]);
         }
 
-        SendClientCreatedEmail::dispatch($client);
+        $clientEstimate = ClientEstimate::updateOrCreate(
+            ['client_id' => $client->id],
+            [
+                'fatura_copel' => $request->fatura_copel,
+                'final_value_discount' => $request->final_value_discount,
+            ]
+        );
 
-        return response()->json($client, 201);
+        SendClientCreatedEmail::dispatch($client, $clientEstimate);
+
+        return response()->json($client, 200);
     }
 
     public function show($id)

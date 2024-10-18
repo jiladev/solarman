@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\Client;
+use App\Models\ClientEstimate;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -13,10 +14,12 @@ class ClientCreated extends Mailable
     use Queueable, SerializesModels;
 
     public $client;
+    public $clientEstimate;
 
-    public function __construct(Client $client)
+    public function __construct(Client $client, ClientEstimate $clientEstimate)
     {
         $this->client = $client;
+        $this->clientEstimate = $clientEstimate;
     }
 
     /**
@@ -26,10 +29,11 @@ class ClientCreated extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.clientCreated.client_created')
+        return $this->view('emails.client_created')
             ->subject('Um cliente acabou de fazer um orçamento')
             ->with([
                 'client' => $this->client,
+                'clientEstimate' => $this->clientEstimate,
             ]);
     }
 }
