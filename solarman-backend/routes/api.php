@@ -59,29 +59,3 @@ Route::prefix('/variables')->group(function () {
 
 Route::get('/reports', [ReportController::class, 'index']);
 Route::get('/reports/{id}', [ReportController::class, 'show']);
-
-Route::post('/send-email', function () {
-
-    function formatPhoneNumber($phone)
-    {
-        if (strlen($phone) == 11) {
-            return '(' . substr($phone, 0, 2) . ') ' . substr($phone, 2, 5) . '-' . substr($phone, 7);
-        }
-        return $phone;
-    }
-
-    function formatCurrency($value)
-    {
-        return number_format($value, 2, ',', '.');
-    }
-
-    $client = new Client();
-    $clientEstimate = new ClientEstimate();
-    $client->name = 'João Silva Nascimento Nome Grande';
-    $client->phone = formatPhoneNumber('41999999999');
-    $clientEstimate->fatura_copel = formatCurrency(1000);
-    $clientEstimate->final_value_discount = formatCurrency(800);
-
-
-    Mail::to('agente@example.com')->send(new ClientCreated($client, $clientEstimate));
-});
